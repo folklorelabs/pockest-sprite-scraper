@@ -1,4 +1,4 @@
-# Pockest Sprites Scraper
+# Pockest Sprite Scraper
 
 Download character sprites from the [Buckler's Bootcamp Pockest minigame](https://www.streetfighter.com/6/buckler/en/minigame).
 
