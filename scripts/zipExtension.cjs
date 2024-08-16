@@ -2,12 +2,12 @@ const path = require('path');
 const fs = require('fs');
 const { execSync } = require('node:child_process');
 const manifest = require('../dist/manifest.json');
-const { version } = require('../package.json');
+const { name, version } = require('../package.json');
 
 const EXT_SRC = path.resolve(__dirname, '../dist');
 const EXT_WD = path.resolve(__dirname, '../temp');
 const EXT_DEST = path.resolve(__dirname, '../artifacts');
-const EXT_FILE = `PockestHelper${version.includes('rc') ? '_BETA' : ''}_v${version}.zip`;
+const EXT_FILE = `${name}${version.includes('rc') ? '_BETA' : ''}_v${version}.zip`;
 
 async function zip(srcDir, fileName) {
   const extensionZip = `${srcDir}/${fileName}`;
@@ -45,6 +45,6 @@ async function cleanUpManfiest(dir) {
   await fs.rmSync(EXT_WD, { recursive: true, force: true });
 
   // print abs file path
-  // eslint-disable-next-line no-console
+   
   console.log(destFilePath);
 })();
