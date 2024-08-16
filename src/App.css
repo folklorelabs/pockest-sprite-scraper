@@ -1,0 +1,30 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.SpriteList {
+  display: block;
+  text-wrap: balance;
+}
+
+.HashSelect {
+  margin: 0.5em;
+}
+
+.Sprite {
+  display: inline-block;
+  margin: 0.25em;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.25em;
+  transition: border-color 0.2s;
+}
+.Sprite:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.Sprite-img {
+  display: block;
+}

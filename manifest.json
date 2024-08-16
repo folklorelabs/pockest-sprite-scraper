@@ -1,0 +1,17 @@
+{
+    "name": "Pockest Sprite Scraper",
+    "version": "1.0.0",
+    "manifest_version": 3,
+    "action": { "default_popup": "index.html" },
+    "content_scripts": [
+        {
+            "js": ["src/scraper.tsx"],
+            "matches": ["https://www.streetfighter.com/6/buckler/minigame"]
+        }
+    ],
+    "icons": {
+        "32": "src/assets/icon32.png",
+        "48": "src/assets/icon48.png",
+        "128": "src/assets/icon128.png"
+    }
+  }
