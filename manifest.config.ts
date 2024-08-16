@@ -5,11 +5,18 @@ import { version as versionName } from './package.json';
 const [version, label = ''] = versionName.split('-');
 const rcVersion = label.split('.')[1];
 
+const NAME = 'Pockest Sprite Scraper';
+
 export default defineManifest(() => ({
   manifest_version: 3,
-  name: !rcVersion ? 'Pockest Sprite Scraper' : '[BETA] Pockest Sprite Scraper',
+  name: !rcVersion ? NAME : `[BETA] ${NAME}`,
   version: !rcVersion ? version : `${version}.${rcVersion}`,
   version_name: versionName,
+  icons: {
+      32: 'src/assets/icon32.png',
+      48: 'src/assets/icon48.png',
+      128: 'src/assets/icon128.png'
+  },
   action: { default_popup: 'index.html' },
   content_scripts: [
       {
@@ -17,9 +24,4 @@ export default defineManifest(() => ({
           matches: ['https://www.streetfighter.com/6/buckler/minigame']
       }
   ],
-  icons: {
-      32: 'src/assets/icon32.png',
-      48: 'src/assets/icon48.png',
-      128: 'src/assets/icon128.png'
-  }
 }));
