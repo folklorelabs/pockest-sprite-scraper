@@ -13,15 +13,16 @@ export default defineManifest(() => ({
   version: !rcVersion ? version : `${version}.${rcVersion}`,
   version_name: versionName,
   icons: {
-      32: 'src/assets/icon32.png',
-      48: 'src/assets/icon48.png',
-      128: 'src/assets/icon128.png'
+    16: 'src/assets/icon16.png',
+    32: 'src/assets/icon32.png',
+    48: 'src/assets/icon48.png',
+    128: 'src/assets/icon128.png'
   },
   action: { default_popup: 'index.html' },
   content_scripts: [
-      {
-          js: ['src/scraper.tsx'],
-          matches: ['https://www.streetfighter.com/6/buckler/minigame']
-      }
+    {
+        js: ['src/scraper.tsx'],
+        matches: ['https://www.streetfighter.com/6/buckler/minigame']
+    }
   ],
 }));
