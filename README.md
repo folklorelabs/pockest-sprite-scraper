@@ -6,4 +6,4 @@ Download character sprites from the [Buckler's Bootcamp Pockest minigame](https:
 
 ## Installation
 
-Grab the [latest release](https://github.com/folklorelabs/pockest-sprites/releases/latest), install it, and click the addon. 
+Download the [latest release](https://github.com/folklorelabs/pockest-sprites/releases/latest), install it, and click the addon. 
