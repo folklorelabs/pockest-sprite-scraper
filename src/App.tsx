@@ -27,8 +27,7 @@ function App() {
       const hashes: { id: string, type: string }[] = await res.json();
       const filteredHashes = hashes?.filter((h) => h.id && h.type === 'char');
       setAllHashes(filteredHashes);
-      // setHash(filteredHashes?.[0]?.id);
-      setHash('4079-AIohJjTf');
+      setHash(filteredHashes?.[0]?.id);
     })();
   }, []);
 
