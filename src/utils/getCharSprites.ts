@@ -3,27 +3,24 @@ type FrameMeta = { rotated: boolean; frame: { x: number; y: number; w: number; h
 function getFrameImgSrc(hash:string, frameMeta: FrameMeta): Promise<string> {
   return new Promise((resolve) => {
     const canvas = document.createElement('canvas');
-    canvas.width = frameMeta.frame.w;
-    canvas.height = frameMeta.frame.h;
+    const { rotated } = frameMeta;
+    canvas.width = rotated ? frameMeta.frame.h : frameMeta.frame.w;
+    canvas.height = rotated ? frameMeta.frame.w :frameMeta.frame.h;
     const ctx = canvas.getContext('2d');
     const img = new Image();
     img.addEventListener('load', () => {
       if (!ctx) return;
-      if (frameMeta.rotated) {
-        ctx.rotate(-90 * (Math.PI / 180));
-      }
-      const size = Math.max(frameMeta.frame.w, frameMeta.frame.h);
       const srcImgMeta = {
         x: frameMeta.frame.x,
         y: frameMeta.frame.y,
-        w: size,
-        h: size,
+        w: rotated ? frameMeta.frame.h : frameMeta.frame.w,
+        h: rotated ? frameMeta.frame.w :frameMeta.frame.h,
       };
       const destMeta = {
-        x: frameMeta.rotated ? -srcImgMeta.h : 0,
+        x: 0,
         y: 0,
-        w: size,
-        h: size,
+        w: rotated ? frameMeta.frame.h : frameMeta.frame.w,
+        h: rotated ? frameMeta.frame.w :frameMeta.frame.h,
       };
       ctx.drawImage(
         img,
@@ -43,6 +40,27 @@ function getFrameImgSrc(hash:string, frameMeta: FrameMeta): Promise<string> {
   });
 }
 
+function rotateBase64Image(base64data:string, rotateDeg: number): Promise<string> {
+  return new Promise((resolve) => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const image = new Image();
+    image.src = base64data;
+    image.onload = function() {
+      if (!ctx) return;
+      const w = image.width;
+      const h = image.height;
+      canvas.width = h;
+      canvas.height = w;
+      ctx.rotate(rotateDeg * (Math.PI / 180));
+      ctx.drawImage(image, 0, 0, w, h, -w, 0, w, h); 
+      const output = canvas.toDataURL();
+      resolve(output);
+    };
+  });
+}
+
 async function getCharSprites(hash:string) {
     if (!hash) {
       throw new Error(`Invalid hash ${hash}`);
@@ -54,7 +72,14 @@ async function getCharSprites(hash:string) {
     }
     const { frames } = await res.json();
     const frameKeys = Object.keys(frames);
-    const frameReses = frameKeys.map(async (key) => getFrameImgSrc(hash, frames[key]));
+    const frameReses = frameKeys.map(async (key) => {
+      const frameMeta = frames[key];
+      let sprite = await getFrameImgSrc(hash, frameMeta);
+      if (frameMeta.rotated) {
+        sprite = await rotateBase64Image(sprite, -90)
+      }
+      return sprite;
+    });
     const imgSrcs = await Promise.all(frameReses);
     return imgSrcs.map((data, i) => ({
       fileName: frameKeys[i],

@@ -6,10 +6,10 @@ import getCharSprites from './utils/getCharSprites';
 import './App.css';
 
 function App() {
-  const [allMonsters, setAllMonsters] = React.useState<{name_en:string, monster_id:string}[]>([]);
-  const [allHashes, setAllHashes] = React.useState<{id:string, type:string}[]>([]);
+  const [allMonsters, setAllMonsters] = React.useState<{ name_en: string, monster_id: string }[]>([]);
+  const [allHashes, setAllHashes] = React.useState<{ id: string, type: string }[]>([]);
   const [hash, setHash] = React.useState<string>();
-  const [charSprites, setCharSprites] = React.useState<{fileName:string;data:string;}[]>([]);
+  const [charSprites, setCharSprites] = React.useState<{ fileName: string; data: string; }[]>([]);
 
   React.useEffect(() => {
     (async () => {
@@ -20,23 +20,24 @@ function App() {
   }, [hash]);
 
   React.useEffect(() => {
-    (async() => {
+    (async () => {
       const url = 'https://folklorelabs.io/pockest-helper-data/v2/hashes.min.json';
       const res = await fetch(url);
       if (!res.ok) throw new Error(`Network error ${res.status} (${url})`);
-      const hashes:{id:string, type:string}[] = await res.json();
-      const filteredHashes = hashes?.filter((h) => h.id && h.type==='char');
+      const hashes: { id: string, type: string }[] = await res.json();
+      const filteredHashes = hashes?.filter((h) => h.id && h.type === 'char');
       setAllHashes(filteredHashes);
-      setHash(filteredHashes?.[0]?.id);
+      // setHash(filteredHashes?.[0]?.id);
+      setHash('4079-AIohJjTf');
     })();
   }, []);
 
   React.useEffect(() => {
-    (async() => {
+    (async () => {
       const url = 'https://folklorelabs.io/pockest-helper-data/v2/monsters.min.json';
       const res = await fetch(url);
       if (!res.ok) throw new Error(`Network error ${res.status} (${url})`);
-      const monsters:{name_en:string, monster_id:string}[] = await res.json();
+      const monsters: { name_en: string, monster_id: string }[] = await res.json();
       setAllMonsters(monsters);
     })();
   }, []);
@@ -82,7 +83,7 @@ function App() {
           charSprites?.forEach((sprite) => {
             zip.file(sprite.fileName, sprite?.data?.split('base64,')?.[1], { base64: true });
           });
-          zip.generateAsync({ type: 'blob' }).then(function(content) {
+          zip.generateAsync({ type: 'blob' }).then(function (content) {
             saveAs(content, `${hash}.zip`);
           });
         }}
