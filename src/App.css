@@ -10,8 +10,18 @@
   text-wrap: balance;
 }
 
+.HashInput,
 .HashSelect {
   margin: 0.5em;
+}
+
+.HashInput--hidden,
+.HashSelect--hidden {
+  display: none;
+}
+
+.IsSelectCheck {
+  display: flex;
 }
 
 .Sprite {

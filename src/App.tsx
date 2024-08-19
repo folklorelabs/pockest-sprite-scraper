@@ -1,23 +1,35 @@
 import React from 'react';
+import cx from 'classnames';
 import { debounce } from 'throttle-debounce';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
-import getCharSprites from './utils/getCharSprites';
+import fetchAllMonsters from './api/fetchAllMonsters';
+import Monster from './types/Monster';
+import Hash from './types/Hash';
+import CharSprite from './types/CharSprite';
+import fetchCharSprites from './api/fetchCharSprites';
 import './App.css';
 
 function App() {
-  const [allMonsters, setAllMonsters] = React.useState<{ name_en: string, monster_id: string }[]>([]);
-  const [allHashes, setAllHashes] = React.useState<{ id: string, type: string }[]>([]);
+  // const [isSelect, setIsSelect] = React.useState(true);
+  const [allMonsters, setAllMonsters] = React.useState<Monster[]>([]);
+  const [allHashes, setAllHashes] = React.useState<Hash[]>([]);
   const [hash, setHash] = React.useState<string>();
-  const [charSprites, setCharSprites] = React.useState<{ fileName: string; data: string; }[]>([]);
+  const [charSprites, setCharSprites] = React.useState<CharSprite[]>([]);
+
+  // const monster = React.useMemo(() => allMonsters?.find((m) => hash.includes(`${m.monster_id}`)), [allMonsters, hash]);
 
   React.useEffect(() => {
     (async () => {
-      if (!hash) return;
-      const newcharSprites = await getCharSprites(hash);
-      setCharSprites(newcharSprites);
+      const url = 'https://www.streetfighter.com/6/buckler/api/minigame/encyclopedia/list';
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Network error ${res.status} (${url})`);
+      const hashes: { id: string, type: string }[] = await res.json();
+      const filteredHashes = hashes?.filter((h) => h.id && h.type === 'char');
+      setAllHashes(filteredHashes);
+      setHash(filteredHashes?.[0]?.id);
     })();
-  }, [hash]);
+  }, []);
 
   React.useEffect(() => {
     (async () => {
@@ -33,32 +45,73 @@ function App() {
 
   React.useEffect(() => {
     (async () => {
-      const url = 'https://folklorelabs.io/pockest-helper-data/v2/monsters.min.json';
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`Network error ${res.status} (${url})`);
-      const monsters: { name_en: string, monster_id: string }[] = await res.json();
-      setAllMonsters(monsters);
+      const newAllMonsters = await fetchAllMonsters();
+      setAllMonsters(newAllMonsters);
     })();
   }, []);
+
+  React.useEffect(() => {
+    (async () => {
+      if (!hash) return;
+      const newcharSprites = await fetchCharSprites(hash);
+      setCharSprites(newcharSprites);
+    })();
+  }, [hash]);
 
   if (!allHashes?.length || !allMonsters?.length || !charSprites?.length) return 'Loading...';
 
   return (
     <div className="App">
-      <select
-        className="HashSelect"
-        onChange={debounce(500, (e: React.ChangeEvent<HTMLSelectElement>) => {
-          setCharSprites([]);
-          setHash(e?.target?.value);
-        })}
-        defaultValue={hash}
-      >
-        {allHashes?.map((h) => (
-          <option key={h.id} value={h.id}>
-            {allMonsters.find((m) => h.id.includes(m?.monster_id))?.name_en || h.id}
-          </option>
-        ))}
-      </select>
+      {/* <div>
+        <label className="IsSelectCheck">
+          <input
+            type="checkbox"
+            onChange={debounce(500, (e: React.ChangeEvent<HTMLInputElement>) => {
+              setIsSelect(!e.target.checked)
+            })}
+            defaultChecked={!isSelect}
+          />
+          Hash Editor
+        </label>
+      </div> */}
+      {/* {isSelect ? ( */}
+        <select
+          className={cx(
+            'HashSelect',
+            // {
+            //   'HashSelect--hidden': !isSelect
+            // },
+          )}
+          onChange={debounce(500, (e: React.ChangeEvent<HTMLSelectElement>) => {
+            setCharSprites([]);
+            setHash(e?.target?.value);
+          })}
+          defaultValue={hash}
+        >
+          {allHashes?.map((h) => {
+            const m = allMonsters?.find((m2) => new RegExp(`^${m2.monster_id}-`).test(h.id));
+            return (
+              <option key={h.id} value={h.id}>
+                {m?.name_en || h.id}
+              </option>
+            );
+          })}
+        </select>
+      {/* ) : (
+        <input
+          className={cx(
+            'HashInput',
+            {
+              'HashInput--hidden': isSelect
+            },
+          )}
+          onChange={debounce(500, (e: React.ChangeEvent<HTMLInputElement>) => {
+            setCharSprites([]);
+            setHash(e?.target?.value);
+          })}
+          defaultValue={hash}
+        />
+      )} */}
       <div className="SpriteList">
         {charSprites?.map((sprite) => (
           <a
